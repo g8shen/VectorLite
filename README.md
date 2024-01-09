@@ -1,0 +1,2 @@
+# VectorLite
+Lightweight Vector Database
