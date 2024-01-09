@@ -77,15 +77,15 @@ func crudDemo() {
 		entry := VectorEntry{Vector: vector, Key: fmt.Sprintf("key%d", i), Data: json.RawMessage(data)}
 		db2.Insert(entry)
 	}
-	printDatabaseEntries(&db2)
+	display(&db2)
 
 	fmt.Println("\nUpdating 'key2':")
 	newVector := Vector{20, 40}
 	db2.Update("key2", newVector)
-	printDatabaseEntries(&db2)
+	display(&db2)
 
 	fmt.Println("\nDeleting 'key2':")
 	db2.Delete("key2")
-	printDatabaseEntries(&db2)
+	display(&db2)
 	db2.Save("../datastore/dummy.gob")
 }
