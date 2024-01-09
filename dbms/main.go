@@ -30,33 +30,39 @@ func retrevialDemo() {
 	}
 
 	queryMedia := Media{
-		Title:           "Query Show", // Title is not used in the query, can be any string
-		Type:            "Movie",      // Type of the show, either "Movie" or "Show"
-		Rating:          4.0,          // Rating out of 5 (5 being the highest rating)
-		Length:          0.6,          // Normalized length (e.g., 0 for short, 1 for long)
-		Year:            0.8,          // Normalized release year (0 for older, 1 for recent)
-		Popularity:      0.75,         // Normalized popularity (0 for least popular, 1 for most popular)
-		CriticalAcclaim: 4.2,          // Critical acclaim out of 5 (5 being highly critically acclaimed)
-		AudienceTarget:  0.5,          // Normalized target audience (e.g., 0 for kids, 1 for adults)
-		Genre:           "Action",     // Genre of the show/movie
+		Title:           "Action Movie", // Genre + Type, not actually used in query
+		Type:            "Movie",        // Type of the media, either "Movie" or "Show"
+		Rating:          4.0,            // Rating out of 5 (5 being the highest rating)
+		Length:          0.6,            // Normalized length (e.g., 0 for short, 1 for long)
+		Year:            0.8,            // Normalized release year (0 for older, 1 for recent)
+		Popularity:      0.75,           // Normalized popularity (0 for least popular, 1 for most popular)
+		CriticalAcclaim: 4.2,            // Critical acclaim out of 5 (5 being highly critically acclaimed)
+		AudienceTarget:  0.5,            // Normalized target audience (e.g., 0 for kids, 1 for adults)
+		Genre:           "Action",       // Genre of the show/movie
 	}
 
 	queryVector := createMediaVector(queryMedia)
+	fmt.Printf("Query Key: %s\n", queryVector.Key)
+	fmt.Printf("Query Vector: %v\n", queryVector.Vector)
+	fmt.Printf("Query Metadata: %+v\n", JSONAsString(queryVector))
+	fmt.Println("")
 
 	k := 5
 	nearestNeighbours := db1.kNN(queryVector.Vector, k, euclideanDistance)
-
-	fmt.Println("Shows/Movies most similar to the query:")
+	fmt.Println("Shows/Movies most similar to the query by magnitude:")
+	fmt.Println("")
 	for _, media := range nearestNeighbours {
 		fmt.Printf("Key: %s, Vector: %v\n", media.Key, media.Vector)
 	}
+	fmt.Println("")
 
 	nearestNeighbours = db1.kNN(queryVector.Vector, k, cosineSimilarity)
-
-	fmt.Println("Shows/Movies most similar to the query:")
+	fmt.Println("Shows/Movies most similar to the query by orientation:")
+	fmt.Println("")
 	for _, media := range nearestNeighbours {
 		fmt.Printf("Key: %s, Vector: %v\n", media.Key, media.Vector)
 	}
+	fmt.Println("")
 
 	err = db1.Save("../datastore/media.gob")
 	if err != nil {
