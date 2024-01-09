@@ -1,26 +1,30 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 )
 
 func main() {
+	crudDemo()
+	retrevialDemo()
+}
 
-	//VECTOR RETREVIAL DEMO
+// Retrevial, kNN search, euclid + cosine demo
+func retrevialDemo() {
 
-	db := VectorDB{}
-
-	err := db.Load("../datastore/media.gob")
+	db1 := VectorDB{}
+	err := db1.Load("../datastore/media.gob")
 	if err != nil {
 		fmt.Println("Load error:", err)
 	}
 
-	if len(db.Entries) == 0 {
+	if len(db1.Entries) == 0 {
 		fmt.Println("No data loaded from file, populating database with random dataset.")
 		media := generateRandomMedia(1000)
 		for _, media := range media {
 			vectorEntry := createMediaVector(media)
-			db.Insert(vectorEntry)
+			db1.Insert(vectorEntry)
 		}
 
 	}
@@ -40,25 +44,48 @@ func main() {
 	queryVector := createMediaVector(queryMedia)
 
 	k := 5
-	nearestNeighbours := db.kNN(queryVector.Vector, k, euclideanDistance)
+	nearestNeighbours := db1.kNN(queryVector.Vector, k, euclideanDistance)
 
 	fmt.Println("Shows/Movies most similar to the query:")
 	for _, media := range nearestNeighbours {
 		fmt.Printf("Key: %s, Vector: %v\n", media.Key, media.Vector)
 	}
 
-	nearestNeighbours = db.kNN(queryVector.Vector, k, cosineSimilarity)
+	nearestNeighbours = db1.kNN(queryVector.Vector, k, cosineSimilarity)
 
 	fmt.Println("Shows/Movies most similar to the query:")
 	for _, media := range nearestNeighbours {
 		fmt.Printf("Key: %s, Vector: %v\n", media.Key, media.Vector)
 	}
 
-	err = db.Save("../datastore/media.gob")
+	err = db1.Save("../datastore/media.gob")
 	if err != nil {
 		fmt.Println("Save error:", err)
 		return
 	}
-	fmt.Printf("Number of entries in the database: %d\n", len(db.Entries))
+}
 
+// Crud Demo
+func crudDemo() {
+	db2 := VectorDB{}
+	db2.Clear()
+	db2.Save("../datastore/dummy.gob")
+	fmt.Println("Inserting Data:")
+	for i := 0; i < 3; i++ {
+		vector := Vector{float64(i), float64(i) * 2}
+		data, _ := json.Marshal(map[string]string{"info": fmt.Sprintf("data %d", i)})
+		entry := VectorEntry{Vector: vector, Key: fmt.Sprintf("key%d", i), Data: json.RawMessage(data)}
+		db2.Insert(entry)
+	}
+	printDatabaseEntries(&db2)
+
+	fmt.Println("\nUpdating 'key2':")
+	newVector := Vector{20, 40}
+	db2.Update("key2", newVector)
+	printDatabaseEntries(&db2)
+
+	fmt.Println("\nDeleting 'key2':")
+	db2.Delete("key2")
+	printDatabaseEntries(&db2)
+	db2.Save("../datastore/dummy.gob")
 }
