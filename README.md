@@ -18,7 +18,7 @@ Go is the only prerequisites
 2. Open a terminal at the folder directory
 3. Enter  `cd dbms`
 4. Enter `go run .`
-5. The k-NN search and CRUD demo should run
+5. The k-NN search & CRUD demo should run in the terminal
 6. Play around!
 
 ## Basic Usage
@@ -76,3 +76,46 @@ db.Update("key", VectorEntry)
 ```go
 db.Delete("key")
 ```
+
+## Demo Preview
+
+Below is the k-NN search with Euclidean distance portion of the demo. The straight-line distance between two points in a multi-dimensional space is measured, resulting in the nearest neighbours tending to have numerical values close to the query vector. This is due to Euclidean distance considers the magnitude of each dimension in the vector. 
+
+1. Starting with a struct with a mix of pre-normalized numerical values, weighted numerical values and categorical non-numerical values.
+
+```go
+	queryMedia := Media{
+		Title:           "Action Movie", // Genre + Type, not actually used in query
+		Type:            "Movie",        // Type of the media, either "Movie" or "Show"
+		Rating:          4.0,            // Rating out of 5 (5 being the highest rating)
+		Length:          0.6,            // Normalized length (e.g., 0 for short, 1 for long)
+		Year:            0.8,            // Normalized release year (0 for older, 1 for recent)
+		Popularity:      0.75,           // Normalized popularity (0 for least popular, 1 for most popular)
+		CriticalAcclaim: 4.2,            // Critical acclaim out of 5 (5 being highly critically acclaimed)
+		AudienceTarget:  0.5,            // Normalized target audience (e.g., 0 for kids, 1 for adults)
+		Genre:           "Action",       // Genre of the show/movie
+	}
+```
+
+2. Transform to vector to use to query, one-hot encoding the categorical values.
+
+```go
+Query Vector: [4 0.6 0.8 0.75 4.2 0.5 1 0 0 0 0 0 0 1]
+```
+
+3. Run a search against the database populated with pre-generated vectors.
+
+```go
+nearestNeighbours := db1.kNN(queryVector.Vector, 5, euclideanDistance)
+```
+
+4. Output!
+
+```go
+Key: Action Movie 657, Vector: [4.5 0.3 0.9 0.9 4.2 0.2 1 0 0 0 0 0 0 1]
+Key: Action Movie 936, Vector: [4 0.1 0.5 0.7 3.9 0.3 1 0 0 0 0 0 0 1]
+Key: Action Movie 169, Vector: [4.3 1 0.7 0.6 3.8 0.7 1 0 0 0 0 0 0 1]
+Key: Action Movie 711, Vector: [4.4 0.9 0.7 0.7 3.7 0.6 1 0 0 0 0 0 0 1]
+Key: Action Movie 437, Vector: [4.1 0.9 0.9 0.2 4.7 0.9 1 0 0 0 0 0 0 1]
+```
+
