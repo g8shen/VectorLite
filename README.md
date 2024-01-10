@@ -19,6 +19,7 @@ Go is the only prerequisites
 3. Enter  `cd dbms`
 4. Enter `go run .`
 5. The k-NN search & CRUD demo should run in the terminal
+	- There is a demo preview at the end of README
 6. Play around!
 
 ## Basic Usage
@@ -79,7 +80,7 @@ db.Delete("key")
 
 ## Demo Preview
 
-Below is the k-NN search with Euclidean distance portion of the demo. The straight-line distance between two points in a multi-dimensional space is measured, resulting in the nearest neighbours tending to have numerical values close to the query vector. This is due to Euclidean distance considers the magnitude of each dimension in the vector. 
+Below is the k-NN search with Euclidean distance portion of the demo. The straight-line distance between two points in multi-dimensional space, identifying nearest neighbours with values close to the query vector. This is due to Euclidean distance considers the magnitude of each dimension in the vector, opposed to Cosine which considers the direction. 
 
 1. Starting with a struct with a mix of pre-normalized numerical values, weighted numerical values and categorical non-numerical values.
 
@@ -106,7 +107,7 @@ Query Vector: [4 0.6 0.8 0.75 4.2 0.5 1 0 0 0 0 0 0 1]
 3. Run a search against the database populated with pre-generated vectors.
 
 ```go
-nearestNeighbours := db1.kNN(queryVector.Vector, 5, euclideanDistance)
+nearestNeighbours := db.kNN(queryVector.Vector, 5, euclideanDistance)
 ```
 
 4. Output!
